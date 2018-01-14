@@ -28,7 +28,7 @@ This scanner is inspired from :
  - (1x) Angle Pin 2.54 mm <br><img src=https://raw.githubusercontent.com/etiennecollomb/Super-8-Raspberry-Scan/master/images/components/angle_pin.jpg | width=100>
  - (1x) 2x20 pin IDC Box Header <br><img src=https://raw.githubusercontent.com/etiennecollomb/Super-8-Raspberry-Scan/master/images/components/box_header.jpg | width=100>
  - 2x20 pin Gpio Cable (1x) <br><img src=https://raw.githubusercontent.com/etiennecollomb/Super-8-Raspberry-Scan/master/images/components/gpio_cable.jpg | width=100>
- - polystyrene sheet white (1x) <br><img src=https://raw.githubusercontent.com/etiennecollomb/Super-8-Raspberry-Scan/master/images/components/)
+ - polystyrene sheet white (1x)
  - Structure component (makerbeam.com)
  
 
