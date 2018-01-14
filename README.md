@@ -1,3 +1,7 @@
+<p align="center">
+<img src=https://raw.githubusercontent.com/etiennecollomb/Super-8-Raspberry-Scan/master/images/scanner/IMG_20170502_134240.jpg | width=400> <img src=https://raw.githubusercontent.com/etiennecollomb/Super-8-Raspberry-Scan/master/images/scanner/IMG_20170502_135535.jpg | width=400>
+</p>
+
 # Super-8-Raspberry-Scan
 *A Super 8 Scanner based on Raspberry Pi*
 
