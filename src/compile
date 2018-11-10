@@ -1,0 +1,8 @@
+#!/bin/bash
+
+gcc -c ExtractSuper8Images.cpp -I/usr/local/include/
+g++ -o ExtractSuper8Images ExtractSuper8Images.o -L/usr/local/lib -lopencv_highgui -lopencv_core
+
+
+
+

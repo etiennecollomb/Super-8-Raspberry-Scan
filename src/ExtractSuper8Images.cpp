@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <sstream>
+#include <errno.h>
 #include <dirent.h>
 using namespace std;
 
@@ -19,7 +20,6 @@ using namespace std;
 #include "opencv2/highgui/highgui.hpp"
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui/highgui.hpp>
 using namespace cv;
 
@@ -28,7 +28,7 @@ using namespace cv;
 
 int isPosYFromTag = 1; //1 : perf position in the filename of image
 int isNegative = false; // negative for B&W
-int verticalCorrection = 20; // >0  : UP, <0 = DOWN // zm2 = 20, eumig nautica = 20
+int verticalCorrection = 0; // >0  : UP, <0 = DOWN // zm2 = 20, eumig nautica = 20
 
 
 /** photo count **/
@@ -49,18 +49,32 @@ int numberOfStepsPerFrame = 160; // ie: 200 steps * 16 microStep / 20 teeth
 float numberOfPixel_per_stepMotorMicroStep = (float)super8_ImageHeight / (float)numberOfStepsPerFrame;
 
 /** save datas **/
-string savedImagesDir = "E:\\Super8Scan2\\ScannedFilms\\TEMP\\_ScanImages\\";
-string extractedImagesDir = "E:\\Super8Scan2\\ScannedFilms\\TEMP\\_ExtractedImages\\";
+string baseDir = "/mnt/hgfs/TEMP"; // Shared Dir with Temp Dir on the host
+string savedImagesDir = baseDir + "/_ScanImages/";
+string extractedImagesDir = baseDir + "/_ExtractedImages/";
 
 
 /** Debug mode **/
-int  isDebug = false;
+int isDebug = false;
 
 
 string intToString(int number){
 	ostringstream oss;
 	oss << number;
-	return oss.str();
+
+	string str = "";
+
+	int tempNum = 1;
+	for(int i=0; i<7; i++){
+		tempNum = tempNum * 10;
+		if(number < tempNum){
+			str += "0";
+		}
+	}
+	
+	str += oss.str();
+
+	return str;
 }
 
 
@@ -349,7 +363,7 @@ void extractImage(string imageName, int fileNumber){
 		//=======================================================
 		/** DEBUG **/
 		if(isDebug){
-			string rootFileName = /*intToString(fileNumber) + "_" +*/ imageName.substr(imageName.find_last_of("\\") + 1);
+			string rootFileName = /*intToString(fileNumber) + "_" +*/ imageName.substr(imageName.find_last_of("/") + 1);
 			string savedFilename = extractedImagesDir;
 			savedFilename += "_Debug_"+rootFileName;
 			imwrite( savedFilename, image );
@@ -362,13 +376,14 @@ void extractImage(string imageName, int fileNumber){
 				//Rect myROI(startx, startY, cropWidth, super8_ImageHeight); //if we compute startPerfX
 				Mat croppedImage = image(myROI);
 
-				string rootFileName = /*intToString(fileNumber) + "_" +*/ imageName.substr(imageName.find_last_of("\\") + 1);
+				//string rootFileName = /*intToString(fileNumber) + "_" +*/ imageName.substr(imageName.find_last_of("/") + 1);
+				string rootFileName = "crop_" + intToString(fileNumber) + ".jpg";
 				string savedFilename = extractedImagesDir;
 				savedFilename += rootFileName;
 
 				//cout << savedFilename << endl;
 				imwrite( savedFilename, croppedImage );
-				//cout << "  _Cropped Image: " << savedFilename << endl;
+				cout << "  _Cropped Image: " << savedFilename << endl;
 
 			}
 			else{
@@ -405,23 +420,30 @@ int isFile(const char* name)
 
 int main(int argc, char** argv) {
 
-	cout << "Starting..." << endl;
-
 
 	for(int i=1; i<argc; i=i+2){
-		cout<< argv[i] << " " << argv[i+1] << endl;
 		string arg = argv[i];
-		string value = argv[i+1];
 		if(arg == "-vc"){ //vertical correction
+			cout<< argv[i] << " " << argv[i+1] << endl;
+			string value = argv[i+1];
 			stringstream(value) >> verticalCorrection;
 		}
 		else if(arg == "-ng"){ //is negative
+			cout<< argv[i] << " " << argv[i+1] << endl;	
+			string value = argv[i+1];
 			if(value == "1")
 				isNegative = true;
 			else
 				isNegative = false;
 		}
+		else if(arg == "-h"){
+			cout << "-vc value    :vertical Correction ( >O : UP; <0 : DOWN;)\n-ng value    :isNegative (O = FALSE; 1 = TRUE;)" << endl;
+			return 0;
+		}
 	}
+
+
+	cout << "Starting..." << endl;
 
 	int fileCount = 0;
 	DIR* dir;
@@ -454,7 +476,7 @@ int main(int argc, char** argv) {
 
 			while ((pdir2 = readdir(dir2))){
 				string filename2 = filename;
-				filename2 += "\\";
+				filename2 += "/";
 				filename2 += pdir2->d_name;
 
 				if(filename2.substr(filename2.find_last_of(".") + 1) == "jpeg"){
